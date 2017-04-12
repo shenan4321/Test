@@ -1,0 +1,282 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<div class="modal-dialog" id="dialogStorey" draggable="true" style="width:1200px;">
+    <div class="modal-content solid-fill">
+        <div class="modal-header mtb0">
+            <a class="close modal-close closedBtn2" data-dismiss="modal"></a>
+            <h3 class="mtb0"><span id="storeyInstoreyingName"></span>楼层管理</h3>
+        </div>
+        <div class="modal-body" style="padding-bottom:0">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#admStorey" data-toggle="tab">楼层管理</a></li>
+                <li><a href="#actStorey" data-toggle="tab">楼层统计</a></li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane fade in active" id="admStorey">
+                    <table class="table" id="storeyListTable" style="margin-bottom:0">
+                    </table>
+                </div>
+                <div class="tab-pane" id="actStorey">
+                    <div class="clearfix">
+                        <div class="tab-pane-left">
+                            <table class="table" id="storeyListTable2" style="margin-bottom:0">
+                            </table>
+                        </div>
+                        <div class="tab-pane-right">
+                            <div  class="tab-pane-right-box" style="">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a href="#storeyAct" data-toggle="tab">按楼层统计</a></li>
+                                </ul>
+                                <div class="tab-content tab-content-border" style="">
+                                    <div class="tab-pane active" id="storeyAct">
+                                        <div id="storeyContainer" class="dialog-highchart-box"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="h25"></div>
+        </div>
+    </div>
+</div>
+<script>
+
+    window.actionStoreyEvents = {
+        'click .pass' : function (e, value, row, index) {
+            alert(2);
+        },
+        'click .nopass' : function (e, value, row, index) {
+            alert(1);
+        },
+        'click .storeyEdit' : function (e, value, row, index) {
+            $("#dialogBox2").css('zIndex',++Global.data.zIndex).load(Global.baseDir + "dialogStoreyEdit.html", function(){
+                $("#dialogBox2").show();
+                new DialogStoreyEdit(row);
+            });
+        },
+        'click .adminSpace' : function (e, value, row, index) {
+            $("#dialogBox2").css('zIndex',++Global.data.zIndex).load(Global.baseDir + "dialogSpace.html", function(){
+                $("#dialogBox2").show();
+                new DialogSpace(row);
+            });
+        }
+    };
+
+    function fmtIdx(value, row, index) {
+        return index+1;
+    }
+
+    //checkbox 格式化
+    function stateFormatter(value, row) {
+        if(row.audit_status==1||row.audit_status==2){
+            return {
+                disabled: true
+            };
+        }
+        return value;
+    }
+
+    //状态格式化
+    function statusFormatter(value, row) {
+        if (value == 0) {
+            return "<button type='button' class='btn btn-primary btn-xs pass'>通过</button>"+
+                    "<button type='button' class='btn btn-primary btn-xs nopass' style='margin-left:20px;'>拒绝通过</button>";
+        } else if(value == 1) {
+            return "<span class='pass'>已通过</span>";
+        }else {
+            return "<span class='red'>已拒绝</span>";
+        }
+    }
+
+    //短信状态格式化
+    function msgStausFormatter(value) {
+        return "<button type='button' class='btn btn-primary btn-xs storeyEdit'>修改</button>　"+
+                "<button type='button' class='btn btn-primary btn-xs adminSpace'>空间管理</button>";
+    }
+
+    //参数是楼盘行数据对象
+    function DialogStorey() {
+        //$('#storeyInstoreyingName').html(11);
+        
+        $('#storeyListTable2').bootstrapTable({
+            columns: [{
+                field: 'index',
+                formatter:fmtIdx,
+                title: '序号',
+                width:80
+            },{
+                field: 'storeyName',
+                title: '楼层名',
+                width:153
+            }],
+            data: Global.data.storeysList,
+            height:Global.data.storeysList.length>8?410:null,
+            clickToSelect: true,
+            singleSelect: true,
+            onClickRow:function(row,$element){
+                $('#storeyListTable2').find('tr').removeClass('bg-gray');
+                $element.addClass('bg-gray');
+            }
+        }).bootstrapTable('hideLoading');
+   
+        $('#storeyListTable').bootstrapTable({
+            columns: [{
+                field: 'index',
+                formatter:fmtIdx
+            },{
+                field: 'storeySerial',
+                title: '楼层号'
+            }, {
+                field: 'storeyName',
+                title: '楼层名'
+            }, {
+                field: 'mgr',
+                title: '操作',
+                formatter: msgStausFormatter,
+                events: actionStoreyEvents
+            }],
+            data: Global.data.storeysList,
+            pagination:true,
+            cache: false,
+            striped: true,
+            sidePagination: 'client', // client or server
+            pageNumber: 1,
+            pageSize: 10,
+            pageList: [5,10,15],
+            paginationHAlign: 'right', //right, left
+            paginationVAlign: 'bottom', //bottom, top, both
+            sortable:false,
+            search: true,
+            showColumns: false,
+            showPaginationSwitch: false,
+            showRefresh: true,
+            clickToSelect: true
+        }).bootstrapTable('hideLoading');
+
+
+        
+        $('#dialogStorey').modal({backdrop:false,isShown:false}).draggable({
+            handle: ".modal-header",
+            cursor: 'move',
+            refreshPositions: false
+        }).find('.closedBtn1,.closedBtn2').click(function(){
+            $('#dialogBox1').empty().hide();
+        });
+
+        
+        
+        Global.bimServerApi.call("SMSInterface", "statRentedRateOfStoreys", {buildingSerial:2} , function(data){
+			var seriesData = [];
+			var nameData= [];
+			var len  =  data.length;
+			for(var i=0;i<data.length;i++){
+				seriesData.push({name: data[i].buildingName,y: parseFloat(data[i].rentedRate).toFixed(4)*100});
+				nameData[i]=data[i].buildingName;
+			}
+			console.log(nameData);
+			console.log(seriesData);
+			//配置chart参数
+	        chart = new Highcharts.Chart({
+	            chart:{
+	                renderTo: 'storeyContainer',
+	                type : 'column',
+	                height:320,
+	                backgroundColor:'#fff',
+	                borderColor: '#ccc',
+	                borderWidth: 0,
+	                className: 'dark-container',
+	                plotBackgroundColor: 'rgba(255, 255, 255, .1)',
+	                plotBorderColor: '#ccc',
+	                plotBorderWidth: 1,
+	                spacingTop: 2,
+	                spacingRight: 0,
+	                spacingBottom: 5,
+	                spacingLeft: 0,
+	                width:880
+	            },
+	            //柱条选择栏颜色
+	            colors: ['#50d88d', '#e47473', '#d8d8d8', '#f7a35c', '#8085e9','#f15c80', '#e4d354', '#8085e8', '#8d4653', '#91e8e1','#D9B3E6'],
+	            title : {
+	                text : '楼层出租率比较',
+	                style:{
+	                    fontWeight:'bold',
+	                    fontSize:'26px',
+	                    fontFamily:'微软雅黑',
+	                    color:'#7b7b7b'
+	                }
+	            },
+	            xAxis : {
+	                categories: nameData
+	            },
+	            yAxis: {
+	                title: {
+	                    text: '出租率',
+	                    color:'#ccc'
+	                },
+	                gridLineWidth: 0,
+	                lineColor: '#ccc',
+	                lineWidth: 1,
+	                tickColor: '#ccc',
+	                labels:{style:{color:"#000",cursor:"default",fontSize:"12px"}}
+	            },
+	            plotOptions: {
+	                series: {
+	                    borderWidth: 0,
+	                    dataLabels: {
+	                        enabled: true,
+	                        format: '{point.y}%'
+	                    }
+	                }
+	            },
+	            tooltip : {
+	                headerFormat: '<span style="font-size:11px">出租率</span><br>',
+	                pointFormat: '<span style="color:{point.color}">{point.name}</span>: 出租率是<b>{point.y}%</b> <br/>'
+	            },
+	            drilldown: {
+	                activeAxisLabelStyle: {
+	                    textDecoration: 'none',
+	                    fontSize:'22px',
+	                    color:'#fff'
+	                },
+	                activeDataLabelStyle: {
+	                    textDecoration: 'none',
+	                    fontSize:'22px',
+	                    color:'#fff'
+	                }
+	            },
+	            credits : {
+	                enabled : false
+	            },
+	            series : [ {
+	                name : '出租率',
+	                data : seriesData,
+	                showInLegend: false,
+	                colorByPoint: true,
+	                dataLabels : {
+	                    enabled : true,
+	                    rotation : 0,
+	                    color : '#FFFFFF',
+	                    align : 'center',
+	                    x : 4,
+	                    y : 10,
+	                    style : {
+	                        fontSize : '13px',
+	                        fontFamily : 'Verdana, sans-serif',
+	                        textShadow : '0 0 3px black'
+	                    }
+	                }
+	            }]
+	        });
+			
+		},function(){
+			alert('error')}
+		);
+        
+        
+
+    }
+
+</script>

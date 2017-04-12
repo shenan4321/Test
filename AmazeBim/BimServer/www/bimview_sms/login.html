@@ -1,0 +1,141 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<div class="header"></div>
+
+
+<div class="login container login-box" style="border-radius:8px;">
+    <div class="span7">
+    	<div class="form">
+	    	<form class="loginForm form-horizontal">
+				<div class="form-group serverDiv">
+					<label class="col-lg-2 control-label"  style="padding-left:0;padding-right:0">Server</label>
+					<div class="col-lg-4" style="padding-top: 5px">
+						<span class="serverAddress"></span>
+						<a class="otherServerLink">Other server</a>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-lg-2 control-label tc" style="padding-left:0;padding-right:0;color:#fff;text-indent:5px;" for="inputEmail">登录邮箱</label>
+					<div class="col-lg-10">
+						<div class="input-group">
+		  					<span class="input-group-addon">@</span>
+							<input type="email" class="form-control username" id="inputEmail" placeholder="请输入邮箱地址">
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-lg-2 control-label tc" style="padding-left:0;padding-right:0;color:#fff;text-indent:5px;" for="inputPassword">登录密码</label>
+					<div class="col-lg-10" >
+						<div class="input-group">
+			 				<span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+							<input type="password" class="form-control password" id="inputPassword" placeholder="请输入密码">
+						</div>
+					</div>
+				</div>
+				<div class="form-group" style="margin-bottom:5px;">
+					<div class="col-lg-offset-2 col-lg-10">
+						<button type="button" class="btn loginButton btn-primary">点击登录</button>
+						<button type="button" class="btn btn-default resetPasswordButton">重设密码</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<div style="position:absolute; bottom:5%;text-align:center;color:#fff;width:100%;">本系统使用WebGL技术，建议使用谷歌Chrome浏览器或者火狐Firefox浏览器，在IE等系列浏览器中将无法正常显示。</div>	
+<script>
+function Login(address, username) {
+	var othis = this;
+	
+	if (address != null && address.startsWith("http://")) {
+		address = address.substring(7);
+	}
+	
+	this.show = function(){};
+
+	this.login = function(address) {
+		Global.bimServerApi.login($(".username").val(), $("#inputPassword").val(), function(data){
+			if ($("#rememberMe").is(":checked")) {
+				// Stored cookie
+				$.cookie("autologin" + window.document.location.port, Global.bimServerApi.token, { expires: 31, path: "/"});
+				$.cookie("address" + window.document.location.port, Global.bimServerApi.baseUrl, { expires: 31, path: "/"});
+			} else {
+				// Session coo	kie
+				$.cookie("autologin" + window.document.location.port, Global.bimServerApi.token, { path: "/"});
+				$.cookie("address" + window.document.location.port, Global.bimServerApi.baseUrl, { path: "/"});
+			}
+			Global.bimServerApi.resolveUser(function(user){
+				
+				$(".indexcontainer").load(Global.baseDir + "main.html", function(){
+					$('#cj').show();
+					new Main(address, user).show(false);
+				});
+			});
+		});
+	}
+
+	if (address != null) {
+		$(".serverAddress").html(address);
+	}
+	
+	if (!Settings.allowBimServerAddress()) {
+		$(".serverDiv").hide();
+	}
+	
+	if (username != null) {
+		$("#inputEmail").val(username);
+	}
+
+	$(".header").load(Global.baseDir + "header.html");
+	
+	$(".loginButton").click(function(){
+		othis.login($("#inputServer").val());
+	});
+	
+	$(".login .username, .login .address, .login .password, .login .rememberme").enterpress(function(){
+		othis.login($("#inputServer").val());
+	});
+	
+	this.resetPassword = function(){
+		Global.bimServerApi.callWithFullIndication("AuthInterface", "requestPasswordChange", {username: $(".username").val(), resetUrl: Global.baseDir + "?page=ResetPassword"}, function(){
+			
+		});
+	};
+	
+	this.openIdClick = function(){
+		$(".openidDiv").show();
+		$(".loginForm").hide();
+	};
+	
+	this.registerClick = function(){
+		$(".indexcontainer").load(Global.baseDir + "register.html", function(){
+			new Register($(this));
+		});
+	};
+	
+	$(".registerButton").click(othis.registerClick);;
+	
+	$(".resetPasswordButton").click(function(){
+		othis.resetPassword();
+	});
+	
+	Global.bimServerApi.call("SettingsInterface", "isAllowSelfRegistration", {}, function(enabled){
+		if (enabled) {
+			$(".registerButton").show();
+		}
+	});
+	
+	if (username == null) {
+		$("#inputEmail").focus();
+	} else {
+		$("#inputPassword").focus();
+	}
+	
+	pushHistory({page: "Login"}, "Login");
+	
+	$(".otherServerLink").click(function(){
+		$(".indexcontainer").load(Global.baseDir + "selectserver.html", function(){
+			new SelectServer();
+		});
+	});
+}
+</script>

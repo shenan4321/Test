@@ -1,0 +1,305 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<div class="modal-dialog" id="dialogBuilding" draggable="true" style="width:1200px;">
+    <div class="modal-content">
+        <div class="modal-header mtb0">
+            <a class="close modal-close closedBtn2" data-dismiss="modal"></a>
+            <h3 class="mtb0">建筑物管理</h3>
+        </div>
+        <div class="modal-body" style="padding-bottom:0">
+            <ul id="myTab" class="nav nav-tabs">
+                <li class="active"><a href="#adr1" data-toggle="tab">建筑物管理</a></li>
+                <li><a href="#act1" data-toggle="tab">建筑物统计</a></li>
+            </ul>
+            <div id="myTabContent" class="tab-content">
+                <div class="tab-pane fade in active" id="adr1">
+                    <table class="table" id="buildingTable" style="margin-bottom:0">
+                    </table>
+                </div>
+                <div class="tab-pane" id="act1">
+                    <div class="clearfix" style="padding-top:15px;">
+                        <div class="tab-pane-left">
+                            <table class="table" id="buildListTable2" style="margin-bottom:0">
+                            </table>
+                        </div>
+                        <div class="tab-pane-right">
+                            <div class="tab-pane-right-box">
+                                <ul class="nav nav-tabs">
+                                    <!--class="active"-->
+                                    <!--<li ><a href="#monthBox" data-toggle="tab">按年统计</a></li>
+                                    <li><a href="#act1" data-toggle="tab">按月统计</a></li>-->
+                                    <li class="active"><a href="#storey" data-toggle="tab">按建筑物统计</a></li>
+                                </ul>
+                                <div class="tab-content tab-content-border">
+                                    <!--<div class="tab-pane" id="monthBox">1111</div>
+                                    <div class="tab-pane" id="yearBox">111</div>-->
+                                    <div class="tab-pane" id="storey" style="display:block">
+                                    	<div id="my_container" class="dialog-highchart-box"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="height:30px;"></div>
+    </div>
+</div>
+<script>
+
+    window.actionEvents = {
+        'click .pass' : function (e, value, row, index) {
+        },
+        'click .nopass' : function (e, value, row, index) {
+        },
+        'click .buildingEdit' : function (e, value, row, index) {
+            $("#dialogBox1").css('zIndex',++Global.data.zIndex).load(Global.baseDir + "dialogBuildingEdit.html", function(){
+                $("#dialogBox1").show();
+                new DialogBuildingEdit();
+            });
+        },
+        'click .adminStorey' : function (e, value, row, index) {
+            $("#dialogBox1").css('zIndex',++Global.data.zIndex).load(Global.baseDir + "dialogStorey.html", function(){
+                $("#dialogBox1").show();
+                new DialogStorey(row);
+            });
+        }
+    };
+
+    function fmtIdx(value, row, index) {
+        return index+1;
+    }
+
+    //checkbox 格式化
+    function stateFormatter(value, row) {
+        if(row.audit_status==1||row.audit_status==2){
+            return {
+                disabled: true
+            };
+        }
+        return value;
+    }
+
+    //状态格式化
+    function statusFormatter(value, row) {
+        if (value == 0) {
+            return "<button type='button' class='btn btn-primary btn-xs pass'>通过</button>"+
+                    "<button type='button' class='btn btn-primary btn-xs nopass' style='margin-left:20px;'>拒绝通过</button>";
+        } else if(value == 1) {
+            return "<span class='pass'>已通过</span>";
+        }else {
+            return "<span class='red'>已拒绝</span>";
+        }
+    }
+
+    //短信状态格式化
+    function msgStausFormatter(value) {
+        return "<button type='button' class='btn btn-primary btn-xs buildingEdit'>修改</button>　"+
+                "<button type='button' class='btn btn-primary btn-xs adminStorey'>楼层管理</button>";
+    }
+
+
+    function DialogBuilding() {
+
+    	
+    	$(".ceshi").click(function(event){
+    		othis.addSpace();
+    	});
+
+    	
+    	
+        $('#buildListTable2').bootstrapTable({
+            columns: [{
+                field: 'index',
+                formatter:fmtIdx,
+                title: '序号',
+                width:80
+            },{
+                field: 'buildingName',
+                title: '建筑物名',
+                width:153
+            }],
+            data: Global.data.buildSpaceList,
+            height:400,
+            pagination:false,
+            cache: false,
+            striped: true,
+            sidePagination: 'client', // client or server
+            pageNumber: 1,
+            pageSize: 10,
+            pageList: [5,10,15],
+            paginationHAlign: 'right', //right, left
+            paginationVAlign: 'bottom', //bottom, top, both
+            sortable:false,
+            search: false,
+            showColumns: false,
+            showPaginationSwitch: false,
+            showRefresh: false,
+            clickToSelect: true,
+            onClickRow:function(row,$element){
+                $('.bg-blue').removeClass('bg-blue');
+                $element.find('td').addClass('bg-blue');
+            }
+        });
+
+        
+        
+        $('#buildingTable').bootstrapTable({
+            columns: [{
+                field: 'index',
+                formatter:fmtIdx
+            },{
+                field: 'buildingName',
+                title: '建筑物名'
+            }, {
+                field: 'buildingArea',
+                title: '建筑物地址'
+            }, {
+                field: 'numberOfStoreys',
+                title: '总楼层数'
+            }, {
+                field: 'mgr',
+                title: '操作',
+                formatter: msgStausFormatter,
+                events: actionEvents
+            }],
+            data: Global.data.buildSpaceList,
+            pagination:true,
+            cache: false,
+            striped: true,
+            sidePagination: 'client', // client or server
+            pageNumber: 1,
+            pageSize: 10,
+            pageList: [5,10,15],
+            paginationHAlign: 'right', //right, left
+            paginationVAlign: 'bottom', //bottom, top, both
+            sortable:false,
+            search: true,
+            showColumns: true,
+            showPaginationSwitch: false,
+            showRefresh: true,
+            clickToSelect: true
+        }).bootstrapTable('hideLoading');
+
+        $('#dialogBuilding').modal({backdrop:false,isShown:false}).draggable({
+            handle: ".modal-header",
+            cursor: 'move',
+            refreshPositions: false
+        }).find('.closedBtn2').click(function(){
+            $('#dialogBox').empty().hide();
+        });
+
+        //配置chart参数
+        chart = new Highcharts.Chart({
+            chart:{
+                renderTo: 'my_container',
+                type : 'column',
+                height:320,
+                color:'#fff',
+                backgroundColor:'transparent',
+                borderColor: '#fff',
+                borderWidth: 0,
+                className: 'dark-container',
+                plotBackgroundColor: 'rgba(255, 255, 255, .1)',
+                plotBorderColor: '#fff',
+                plotBorderWidth: 1,
+                spacingTop: 2,
+                spacingRight: 0,
+                spacingBottom: 5,
+                spacingLeft: 0,
+                width:860
+            },
+            //柱条选择栏颜色
+            colors: ['#50d88d', '#e47473', '#d8d8d8', '#f7a35c', '#8085e9',
+                '#f15c80', '#e4d354', '#8085e8', '#8d4653', '#91e8e1'],
+
+            title : {
+                text : '建筑物出租率比较',
+                style:{
+                    fontWeight:'bold',
+                    fontSize:'26px',
+                    fontFamily:'微软雅黑',
+                    color:'#fff',
+                    borderWidth: 0
+                }
+            },
+            xAxis : {
+                categories: ['豪楼1', '豪楼2', '豪楼3'],
+                lineColor:'#fff',
+                tickColor:'#fff',
+                labels:{style:{color:"#fff",cursor:"default",fontSize:"12px"}}
+            },
+            yAxis: {
+                title: {
+                    text: '出租率',
+                    style:{color:"#fff",cursor:"default",fontSize:"12px"}
+                },
+                tickColor:'#fff',
+                gridLineWidth: 0,
+                borderWidth: 0,
+                lineColor: '#fff',
+                lineWidth: 1,
+                tickColor: '#fff',
+                labels:{style:{color:"#fff",cursor:"default",fontSize:"12px"}}
+            },
+            plotOptions: {
+                series: {
+                    borderWidth: 0,
+                    dataLabels: {
+                        enabled: true,
+                        format: '{point.y}%'
+                    }
+                }
+            },
+            tooltip : {
+                headerFormat: '<span style="font-size:11px">出租率</span><br>',
+                pointFormat: '<span style="color:{point.color}">{point.name}</span>: 出租率是<b>{point.y}%</b> <br/>'
+            },
+            drilldown: {
+                activeAxisLabelStyle: {
+                    textDecoration: 'none',
+                    fontSize:'22px',
+                    color:'#fff'
+                },
+                activeDataLabelStyle: {
+                    textDecoration: 'none',
+                    fontSize:'22px',
+                    color:'#fff'
+                }
+            },
+            credits : {
+                enabled : false
+            },
+            series : [ {
+                name : '出租率',
+                data : [{
+                    name: '豪楼1',
+                    y:15
+                }, {
+                    name: '豪楼2',
+                    y:10
+                },{
+                    name: '豪楼3',
+                    y:8
+                }] ,
+
+                showInLegend: false,
+                colorByPoint: true,
+                dataLabels : {
+                    enabled : true,
+                    rotation : 0,
+                    color : '#FFFFFF',
+                    align : 'center',
+                    x : 4,
+                    y : 10,
+                    style : {
+                        fontSize : '13px',
+                        fontFamily : 'Verdana, sans-serif',
+                        textShadow : '0 0 3px #fff'
+                    }
+                }
+            }]
+        });
+    }
+
+</script>

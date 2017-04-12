@@ -1,0 +1,66 @@
+<div class="modal-dialog" id="dialogStoreyEditBox" draggable="true" style="width:550px;">
+    <div class="modal-content solid-fill">
+        <div class="modal-header mtb0">
+            <a class="close modal-close" data-dismiss="modal"></a>
+            <h3 class="mtb0">楼层修改</h3>
+        </div>
+        <div class="modal-body" style="padding-bottom:0">
+            <form class="loginForm form-horizontal">
+                <div class="form-group">
+                    <label class="col-lg-2 control-label tc"  for="inputEmail">楼层号</label>
+                    <div class="col-lg-10">
+                        1
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label tc" for="inputPassword">楼层名</label>
+                    <div class="col-lg-10" >
+                        <input type="text" class="form-control" id="floorName" placeholder="请输入楼层名">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label tc" for="inputPassword">GlobalId</label>
+                    <div class="col-lg-10" >
+                        <input type="text" class="form-control" id="floorGlobalId" placeholder="请输入GlobalId">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default saveBtn1">保存</button>
+            <button type="button" class="btn btn-default closedBtn1" data-dismiss="modal" >关闭</button>
+        </div>
+    </div>
+</div>
+<script>
+    function DialogStoreyEdit(row) {
+		
+        $('#dialogStoreyEditBox').modal({backdrop:false,isShown:false}).draggable({
+            handle: ".modal-header",
+            cursor: 'move',
+            refreshPositions: false
+        }).find('.closedBtn1,.closedBtn2').click(function(){
+            $('#dialogBox2').empty().hide();
+        });
+        
+      
+        
+        $('#dialogStoreyEditBox .saveBtn1').click(function(){
+        	row.storeyName = $('#floorName').val();
+       		row.GlobalId =  $('#floorGlobalId').val();
+       		if(!row.storeyName){
+       			Global.notifier.setError('请填写楼层名称');
+       			return false;
+       		}
+        	Global.bimServerApi.call("SMSInterface", "updateAStorey", {storeySerial:row.storeySerial,globalId:row.GlobalId,storeyName:row.storeyName} , function(data){
+        		Global.notifier.setSuccess('保存成功');
+        		$('#storeyListTable').bootstrapTable('updateRow',{
+         			index:row.index-1,
+        			row:row
+       			});
+        		$('#dialogBox2').empty().hide();
+			});
+        });
+        
+    }
+</script>

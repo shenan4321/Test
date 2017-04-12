@@ -1,0 +1,146 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<div class="addproject">
+  <div class="modal-dialog">
+    <div class="modal-content blue-skin">
+      <div class="modal-header">
+        <h4 class="modal-title white">新建项目</h4>
+      </div>
+      <div class="modal-body">
+        	<form class="form-horizontal" role="form">
+				<div class="form-group">
+					<label class="col-lg-2 control-label" for="inputName">名称</label>
+					<div class="col-lg-9">
+						<input type="text" id="inputName" class="form-control inputName" placeholder="请输入名称">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-lg-2 control-label" for="descriptionInput">描述</label>
+					<div class="col-lg-9">
+						<textarea class="descriptionInput form-control span6" id="descriptionInput" placeholder="请输入描述" cols="60" rows="7"></textarea>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-lg-2 control-label" for="lengthMeasureInput">测量单位</label>
+					<div class="col-lg-9">
+						<select class="lengthMeasureInput form-control span6" id="lengthMeasureInput">
+							<option value="meter" selected>米（m）</option>
+							<option value="millimeter">毫米（mm）</option>
+							<option value="centimeter">厘米（cm）</option>
+							<option value="decimeter">分米（dm）</option>
+							<option value="kilometer">千米（km）</option>
+							<!-- <option value="attometer">attometer</option>
+							<option>femtometer</option>
+							<option>picometer</option>
+							<option>nanometer</option>
+							<option>micrometer</option>
+							<option>millimeter</option>
+							<option>decameter</option>
+							<option>hectometer</option>
+							<option>kilometer</option>
+							<option>megameter</option>
+							<option>gigameter</option>
+							<option>terameter</option>
+							<option>petameter</option>
+							<option>exameter</option> -->
+						</select>
+					</div>
+				</div>
+				<div class="form-group schemaGroup" style="display:none">
+					<label class="col-lg-2 control-label" for="schema">Schema</label>
+					<div class="col-lg-9">
+						<select class="schemaInput form-control span6" id="schema">
+							<option value="ifc2x3tc1" selected="selected">Ifc2x3tc1</option>
+							<!-- <option value="ifc4">Ifc4</option> -->
+						</select>
+					</div>
+				</div>		
+<!-- 		<div class="well well-small buttonBar">
+			<button type="button" class="btn btn-primary addButton">Add</button>
+		</div> -->
+	</form>
+        
+      </div>
+      <div class="modal-footer">
+        <div class="col-lg-offset-2 col-lg-10">
+			<button type="button" class="btn dlbBlueBtn btn-primary addButton">增加</button>
+		</div>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+function AddProject(containerDiv, main, parentProject) {
+	var othis = this;
+
+	this.show = function(){
+		if (parentProject != null && parentProject.schema == "ifc4") {
+			containerDiv.find(".schemaInput").val("ifc4");
+		}
+	};
+
+	this.close = function(){
+	};
+	
+	this.updateProject = function(project) {
+		project.description = $(".descriptionInput").val();
+		project.exportLengthMeasurePrefix = $(".lengthMeasureInput").val();
+		Global.bimServerApi.call("ServiceInterface", "updateProject", {sProject: project}, function(){
+			main.showProject(project.oid, null, true);
+		});
+	};
+	
+	this.addProject = function() {
+		if (parentProject != null) {
+			Global.bimServerApi.callWithFullIndication("Bimsie1ServiceInterface", "addProjectAsSubProject", {
+				schema: $(".schemaInput").val(),
+				parentPoid: parentProject.oid, 
+				projectName: $(".addproject .inputName").val()
+			}, function(data){
+				othis.updateProject(data);
+			});
+		} else {
+			Global.bimServerApi.callWithFullIndication("Bimsie1ServiceInterface", "addProject", {
+				schema: $(".schemaInput").val(),
+				projectName: $(".addproject .inputName").val()
+			}, function(data){
+				othis.updateProject(data);
+			});
+		}
+	};
+
+	$(".addproject .addButton").click(othis.addProject);
+	$(".addproject .inputName").keypress(function(event){
+		if (event.which == 13) {
+			event.preventDefault();
+			othis.addProject();
+		}
+	});
+	$(".addproject .inputName").focus();
+	
+	$('.help-bar').hide();
+}
+</script>

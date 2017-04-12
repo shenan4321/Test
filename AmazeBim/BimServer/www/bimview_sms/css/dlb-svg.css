@@ -1,0 +1,50 @@
+@CHARSET "UTF-8";
+#luopanBox{
+	            position: absolute;
+    bottom: 29px;
+    left: 8px;
+	z-index:20;
+}
+
+.svg-item .sector {
+    transition: all .1s linear;
+    fill: #274b79;
+    stroke:#336CA6
+}
+.svg-item:hover .sector, .svg-item:focus .sector {
+    fill: #eee;
+    stroke:#7DA6C7;
+}
+.svg-item-selected .sector{
+	fill:#f5d96c !important;stroke:#ffc059 !important
+}
+.svg-item-selected .decsec{
+	fill:#decc85 !important
+}
+
+.svg-item .svg-txt{
+    transition: all .1s linear;
+    fill:#fff;
+    cursor: pointer;
+    font-family: "Microsoft YaHei";
+}
+.svg-item:hover  .svg-txt,.svg-item:focus  .svg-txt{
+    fill:#333;
+    font-weight:600;
+}
+.decsec{
+    transition: all .1s linear;
+    fill: #2e84db;
+}
+.svg-item:hover .decsec, .svg-item:focus .decsec{
+    fill: #7DA6C7;
+}
+.svg-item-selected:hover .decsec, .svg-item:focus .decsec{
+    fill: #7DA6C7;
+}
+.svg-item-selected:hover{
+	
+	
+}
+.sector-active{fill:#f5d96c !important;stroke:#fff !important}
+.decsec-active{fill:#decc85 !important}

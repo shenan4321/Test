@@ -1,0 +1,178 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<div class="modal-dialog" id="dialogCompanyEditBox" draggable="true" style="width:750px;">
+    <div class="modal-content solid-fill">
+        <div class="modal-header mtb0">
+            <a class="close modal-close closedBtn2" data-dismiss="modal"></a>
+            <h3 class="mtb0">企业管理</h3>
+        </div>
+        <div class="modal-body" style="padding-bottom:0">
+            <form class="loginForm form-horizontal">
+                <div class="form-group">
+                    <label class="col-lg-2 control-label tc"  for="cmpname">企业名称</label>
+                    <div class="col-lg-10">
+                        <input type="text" class="form-control username" id="cmpName" placeholder="请输入企业名称">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label tc"  for="cmpname">企业类型</label>
+                    <div class="col-lg-10">
+                    	<select class="form-control username" id="cmpType">
+                 	         <option value="民营企业">民营企业</option>
+                 	         <option value="国企">国企</option>
+                    	</select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label tc"  for="cmpname">企业地址</label>
+                    <div class="col-lg-10">
+                        <input type="text" class="form-control username" id="cmpAddress" placeholder="请输入企业类型">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label tc"  for="cmpname">企业人数</label>
+                    <div class="col-lg-10">
+                    	<input type="text" class="form-control username" id="cmpPeople" placeholder="请输入企业人数">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label tc"  for="cmpname">营业执照</label>
+                    <div class="col-lg-10">
+                        <input type="text" class="form-control username" id="cmpYno" placeholder="请输入营业执照编号">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label tc"  for="cmpname">营业执照地址</label>
+                    <div class="col-lg-10">
+                    	<input type="text" class="form-control username" id="cmpYaddress" placeholder="请输入营业执照地址">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label tc"  for="cmpname">营业期限</label>
+                    <div class="col-lg-10">
+                        <input type="text" class="form-control username" id="cmpYTime" placeholder="请输入营业期限">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label tc"  for="cmpname">组织机构代码</label>
+                    <div class="col-lg-10">
+                        <input type="text" class="form-control username" id="cmpOno" placeholder="请输入组织机构代码">
+                    </div>
+                </div>
+<!--                 <div class="form-group">
+                    <label class="col-lg-2 control-label tc"  for="cmpname">经营范围</label>
+                    <div class="col-lg-10">
+                    <textarea id="cmpRound"></textarea>
+                    </div>
+                </div> -->
+                <div class="form-group">
+                    <label class="col-lg-2 control-label tc"  for="cmpname">企业邮箱</label>
+                    <div class="col-lg-10">
+                        <input type="text" class="form-control username" id="cmpCmail" placeholder="请输入企业邮箱">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label tc"  for="cmpname">企业电话</label>
+                    <div class="col-lg-10">
+                        <input type="text" class="form-control username" id="cmpCtel" placeholder="请输入企业电话">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label tc"  for="cmpname">企业法人</label>
+                    <div class="col-lg-10">
+                        <input type="text" class="form-control username" id="cmpLegal" placeholder="请输入企业法人">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label tc"  for="cmpname">企业联系人</label>
+                    <div class="col-lg-10">
+                        <input type="text" class="form-control username" id="cmpContact" placeholder="请输入企业联系人">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label tc"  for="cmpname">联系人电话</label>
+                    <div class="col-lg-10">
+                        <input type="text" class="form-control username" id="cmpMobile" placeholder="请输入企业联系人电话">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default saveBtn1">保存</button>
+            <button type="button" class="btn btn-default closedBtn1" data-dismiss="modal" >关闭</button>
+        </div>
+    </div>
+</div>
+<script>
+function DialogCompanyEdit(rowData) {
+	
+	if(rowData){
+
+		$('#cmpName').val(rowData.name);
+		$('#cmpType').val(rowData.type);
+		$('#cmpAddress').val(rowData.address);
+		$('#cmpPeople').val(rowData.people);
+		$('#cmpYno').val(rowData.yno);
+		$('#cmpYaddress').val(rowData.yaddress);
+		$('#cmpYTime').val(rowData.ytime);
+		$('#cmpOno').val(rowData.ono);
+		$('#cmpCmail').val(rowData.cmail);
+		$('#cmpCtel').val(rowData.ctel);
+		$('#cmpLegal').val(rowData.legal);
+		$('#cmpContact').val(rowData.contact);
+		$('#cmpMobile').val(rowData.mobile);
+		
+	}
+	
+    $('#dialogCompanyEditBox').modal({backdrop:false,isShown:false}).draggable({
+        handle: ".modal-header",
+        cursor: 'move',
+        refreshPositions: false
+    }).find('.closedBtn1,.closedBtn2').click(function(){
+        $('#dialogBoxCompanyEdit').empty().hide();
+    });
+    
+
+    $('#dialogCompanyEditBox .saveBtn1').click(function(){
+    	var row = rowData || {};
+    	row.name = $('#cmpName').val();
+   		row.type =  $('#cmpType').val();
+   		row.address =  $('#cmpAddress').val();
+   		row.people =  $('#cmpPeople').val();
+   		row.yno =  $('#cmpYno').val();
+   		row.yaddress =  $('#cmpYaddress').val();
+   		row.ytime =  $('#cmpYTime').val();
+   		row.ono = $('#cmpOno').val();
+   		row.cmail =  $('#cmpCmail').val();
+   		row.ctel =  $('#cmpCtel').val();
+   		row.legal =  $('#cmpLegal').val();
+   		row.contact =  $('#cmpContact').val();
+   		row.mobile =  $('#cmpMobile').val();
+   		
+   		/* if(!row.storeyName){
+   			Global.notifier.setError('请填写楼层名称');
+   			return false;
+   		} */
+   		if(rowData){
+	   		//Global.bimServerApi.call("SMSInterface", "updateAStorey", {storeySerial:2,globalId:row.GlobalId,storeyName:row.storeyName} , function(data){
+	    		Global.notifier.setSuccess('保存成功');
+	    		$('#companyTable').bootstrapTable('updateRow',{
+	     			index:row.index-1,
+	    			row:row
+	   			});
+	    		$('#dialogBoxCompanyEdit').empty().hide();
+			//});	
+   		}else{
+	   		//Global.bimServerApi.call("SMSInterface", "updateAStorey", {storeySerial:2,globalId:row.GlobalId,storeyName:row.storeyName} , function(data){
+	    		Global.notifier.setSuccess('新增成功');
+	    		$('#companyTable').bootstrapTable('insertRow',{
+	     			index:Global.data.companyData.length-1,
+	    			row:row
+	   			});
+	    		Global.data.companyData.push(row);
+	    		$('#dialogBoxCompanyEdit').empty().hide();
+			//});
+   		}
+    });
+
+}
+</script>

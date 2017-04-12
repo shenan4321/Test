@@ -1,0 +1,109 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<div class="modal-dialog" id="dialogSpaceEditBox" draggable="true" style="width:700px;">
+    <div class="modal-content solid-fill">
+        <div class="modal-header mtb0">
+            <a class="close modal-close closedBtn2" data-dismiss="modal"></a>
+            <h3 class="mtb0">空间修改</h3>
+        </div>
+        <div class="modal-body" style="padding-bottom:0">
+            <form class="loginForm form-horizontal">
+                <div class="form-group">
+                    <label class="col-lg-3 control-label tc">空间GlobalId</label>
+                    <div class="col-lg-9">
+                       	<span id="spcGloabId" style="line-height:33px"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-3 control-label tc" for="spcName">空间名称</label>
+                    <div class="col-lg-9" >
+                        <input type="text" class="form-control" id="spcName">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-3 control-label tc"  for="spcRented">是否已出租</label>
+                    <div class="col-lg-9">
+                        <select class="form-control username" id="spcRented">
+                 	         <option value="是">是</option>
+                 	         <option value="否">否</option>
+                    	</select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-3 control-label tc" for="inputPassword">是否可出租</label>
+                    <div class="col-lg-9" >
+                        <select class="form-control username" id="spcRent">
+                 	         <option value="是">是</option>
+                 	         <option value="否">否</option>
+                    	</select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-3 control-label tc" for="inputPassword">空间所属类别</label>
+                    <div class="col-lg-9" >
+                        <select class="form-control username" id="spcType">
+                 	         <option value="会议室">会议室</option>
+                 	         <option value="办公室">办公室</option>
+                 	         <option value="仓库">仓库</option>
+                    	</select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-3 control-label tc" for="inputPassword">空间是否出售</label>
+                    <div class="col-lg-9" >
+                        <select class="form-control username" id="spcSell">
+                 	         <option value="是">是</option>
+                 	         <option value="否">否</option>
+                    	</select>
+                    </div>
+                </div>
+                
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default saveBtn1">保存</button>
+            <button type="button" class="btn btn-default closedBtn1" data-dismiss="modal" >关闭</button>
+        </div>
+    </div>
+</div>
+<script>
+    function DialogSpaceEdit(rowData) {
+
+    	if(rowData){
+    		$('#spcGloabId').html(rowData.gloabId);
+    		$('#spcName').val(rowData.spacename);
+    		$('#spcRented').val(rowData.isRented);
+    		$('#spcRent').val(rowData.isRent);
+    		$('#spcType').val(rowData.type);
+    		$('#spcSell').val(rowData.isSell);
+    	}
+    	
+    	$('#dialogSpaceEditBox').modal({backdrop:false,isShown:false}).draggable({
+            handle: ".modal-header",
+            cursor: 'move',
+            refreshPositions: false
+        }).find('.closedBtn1,.closedBtn2').click(function(){
+            $('#dialogBox3').empty().hide();
+        });
+        
+    	$('#dialogCompanyEditBox .saveBtn1').click(function(){
+	    	var row = rowData;
+	    	row.spacename = $('#spcName').val();
+	    	row.isRented = $('#spcRented').val();
+	    	row.isRent = $('#spcRent').val();
+	    	row.type = $('#spcType').val();
+	    	row.isSell = $('#spcSell').val();
+	    	
+    		if(rowData){
+		   		//Global.bimServerApi.call("SMSInterface", "updateAStorey", {storeySerial:2,globalId:row.GlobalId,storeyName:row.storeyName} , function(data){
+		    		Global.notifier.setSuccess('修改成功');
+		    		$('#companyTable').bootstrapTable('updateRow',{
+		     			index:rowData.index-1,
+		    			row:row
+		   			});
+		    		$('#dialogBox3').empty().hide();
+				//});	
+	   		}
+       	});
+       	
+    }
+</script>

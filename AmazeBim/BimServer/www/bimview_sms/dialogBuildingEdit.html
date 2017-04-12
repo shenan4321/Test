@@ -1,0 +1,52 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<div class="modal-dialog" id="dialogBuildingEditBox" draggable="true" style="width:550px;">
+    <div class="modal-content solid-fill">
+        <div class="modal-header mtb0">
+            <a class="close modal-close closedBtn2" data-dismiss="modal"></a>
+            <h3 class="mtb0">建筑物修改</h3>
+        </div>
+        <div class="modal-body" style="padding-bottom:0">
+            <form class="loginForm form-horizontal">
+                <div class="form-group">
+                    <label class="col-lg-2 control-label tc"  for="inputEmail">GLOABID</label>
+                    <div class="col-lg-10">
+                        <input type="text" class="form-control username" id="gloabid" placeholder="gloabid">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label tc" for="inputPassword">空间序列</label>
+                    <div class="col-lg-10" >
+                    	<input type="text" class="form-control " id="spaceSerial" placeholder="spaceSerial">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default saveBtn">保存</button>
+            <button type="button" class="btn btn-default closedBtn1" data-dismiss="modal" >关闭</button>
+        </div>
+    </div>
+</div>
+<script>
+    function DialogBuildingEdit() {
+
+        $('#dialogBuildingEditBox').modal({backdrop:false,isShown:false}).draggable({
+            handle: ".modal-header",
+            cursor: 'move',
+            refreshPositions: false
+        }).find('.closedBtn1,.closedBtn2').click(function(){
+            $('#dialogBox1').empty().hide();
+        });
+        
+        $('#dialogBuildingEditBox .saveBtn').click(function(){
+        	var gloadbId = $('#gloabidBuilding').val();
+        	var spaceSerial = $('#spaceSerialBuilding').val();
+        	Global.bimServerApi.call("SMSInterface", "confirmSpace", {globalId:14,spaceSerial:'世界'} , function(data){
+        		Global.notifier.setInfo("Loading model data...", -1);
+    		},function(){
+    			alert('error')}
+    		);
+        });
+
+    }
+</script>

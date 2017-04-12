@@ -1,0 +1,432 @@
+<div class="query2">
+	<div class="alert errorsDiv ih"></div>
+	<form style="margin-right: 10px">
+		<div class="form-group">
+			<select class="form-control">
+			</select>
+		</div>
+		<div class="form-group">
+			<textarea class="form-control queryInp"></textarea>
+		</div>
+		<div class="form-group">
+			<button class="btn btn-primary querySetBtn">Query Set</button>
+			<button class="btn btn-primary queryAddBtn">Query Add</button>
+			<button class="btn btn-primary downloadBtn">Download</button>
+		</div>
+	</form>
+</div>
+<script>
+function Query2(cd, parent) {
+	var o = this;
+	o.roids = [];
+	
+	o.queriesIfc2x3tc1 = {
+		AllObjects: {
+			type: "IfcProduct",
+			includeAllSubtypes: true
+		},
+		AllWalls: {
+			type: "IfcWall",
+			includeAllSubtypes: true
+		},
+		AllWallsIncludingDecomposition: {
+			type: "IfcWall",
+			includeAllSubtypes: true,
+			includes: ["validifc:ContainedInStructure", "validifc:OwnerHistory", "validifc:Representation", "validifc:ObjectPlacement"]
+		},
+		AllWallsIncludingWindowsAndDoors: {
+			type: "IfcWall",
+			includeAllSubtypes: true,
+			include: {
+				type: "IfcWall",
+				field: "HasOpenings",
+				include: {
+					type: "IfcRelVoidsElement",
+					field: "RelatedOpeningElement",
+					include: {
+						type: "IfcOpeningElement",
+						field: "HasFillings",
+						include: {
+							type: "IfcRelFillsElement",
+							field: "RelatedBuildingElement"
+						}
+					}
+				}
+			}
+		},
+		AllWallsIncludingWindows: {
+			type: "IfcWall",
+			includeAllSubtypes: true,
+			include: {
+				type: "IfcWall",
+				field: "HasOpenings",
+				include: {
+					type: "IfcRelVoidsElement",
+					field: "RelatedOpeningElement",
+					include: {
+						type: "IfcOpeningElement",
+						field: "HasFillings",
+						include: {
+							type: "IfcRelFillsElement",
+							field: "RelatedBuildingElement",
+							outputType: "IfcWindow"
+						}
+					}
+				}
+			}
+		},
+		AllWallsAndSlabs: {
+			types: ["IfcWall", "IfcSlab"],
+			includeAllSubtypes: true
+		},
+		SpecificWallsByGuid: {
+			type: "IfcWall",
+			includeAllSubtypes: true,
+			guids: ["2udBPbKibCZ8zbfpJmtDTM", "2V1MCFZRf1GA2ZyRufjYwX", "2oOoWKmmfChQTLCBzuB3$b"]
+		},
+		SpecificBuildingStoreyIncContains: {
+			type: "IfcBuildingStorey",
+			guid: "25SMdCQszBi9al8gnrh8LV",
+			include: {
+				type: "IfcBuildingStorey",
+				field: "ContainsElements",
+				include: {
+					type: "IfcRelContainedInSpatialStructure",
+					field: "RelatedElements"
+				}
+			}
+		},
+		AllPropertiesOf2Spaces1Wall: {
+			guids: [
+				"1geKZCJAHAVQxXKkYkD9nV",
+				"1stYdhm21EUQMz3jV6WdHc",
+				"05yuQkJxb22el7nxTgecJc"
+			],
+			includes: [
+				"validifc:AllProperties",
+				"validifc:ContainedInStructure",
+				"validifc:OwnerHistory",
+				"validifc:Representation",
+				"validifc:ObjectPlacement"
+			]
+		},
+		ExternalWalls: {
+			type: "IfcWall",
+			includeAllSubtypes: true,
+			properties: {
+				IsExternal: true
+			}
+		},
+		ClassificationDakenConstructief: {
+			type: "IfcProduct",
+			includeAllSubtypes: true,
+			classifications: [
+				"57.2"
+			]
+		},
+		ThermalTransmittance: {
+			type: "IfcWall",
+			includeAllSubtypes: true,
+			properties: {
+				ThermalTransmittance: {
+					comparator: ">",
+					value: 0.2
+				}
+			}
+		},
+		IfcPresentationLayerAssignment: {
+			type: "IfcPresentationLayerAssignment",
+			name: "Räume",
+			include: {
+				type: "IfcPresentationLayerAssignment",
+				field: "AssignedItems"
+			}
+		},
+		ObjectInBoundingBox: {
+			type: "IfcFurnishingElement",
+			inBoundingBox: {
+				x: 0,
+				y: 0,
+				z: 0,
+				width: 5,
+				height: 5,
+				depth: 5
+			}
+		}
+	};
+	
+	o.queriesIfc4 = {
+		AllObjects: {
+			type: "IfcProduct",
+			includeAllSubtypes: true
+		},
+		AllWalls: {
+			type: "IfcWall",
+			includeAllSubtypes: true
+		},
+		AllWallsIncludingDecomposition: {
+			type: "IfcWall",
+			includeAllSubtypes: true,
+			includes: ["ifc4stdlib:ContainedInStructure", "ifc4stdlib:OwnerHistory", "ifc4stdlib:Representation", "ifc4stdlib:ObjectPlacement"]
+		},
+		AllWallsIncludingWindowsAndDoors: {
+			type: "IfcWall",
+			includeAllSubtypes: true,
+			include: {
+				type: "IfcWall",
+				field: "HasOpenings",
+				include: {
+					type: "IfcRelVoidsElement",
+					field: "RelatedOpeningElement",
+					include: {
+						type: "IfcOpeningElement",
+						field: "HasFillings",
+						include: {
+							type: "IfcRelFillsElement",
+							field: "RelatedBuildingElement"
+						}
+					}
+				}
+			}
+		},
+		AllWallsIncludingWindows: {
+			type: "IfcWall",
+			includeAllSubtypes: true,
+			include: {
+				type: "IfcWall",
+				field: "HasOpenings",
+				include: {
+					type: "IfcRelVoidsElement",
+					field: "RelatedOpeningElement",
+					include: {
+						type: "IfcOpeningElement",
+						field: "HasFillings",
+						include: {
+							type: "IfcRelFillsElement",
+							field: "RelatedBuildingElement",
+							outputType: "IfcWindow"
+						}
+					}
+				}
+			}
+		},
+		AllWallsAndSlabs: {
+			types: ["IfcWall", "IfcSlab"],
+			includeAllSubtypes: true
+		},
+		SpecificWallsByGuid: {
+			type: "IfcWall",
+			includeAllSubtypes: true,
+			guids: ["2udBPbKibCZ8zbfpJmtDTM", "2V1MCFZRf1GA2ZyRufjYwX", "2oOoWKmmfChQTLCBzuB3$b"]
+		},
+		SpecificBuildingStoreyIncContains: {
+			type: "IfcBuildingStorey",
+			guid: "25SMdCQszBi9al8gnrh8LV",
+			include: {
+				type: "IfcBuildingStorey",
+				field: "ContainsElements",
+				include: {
+					type: "IfcRelContainedInSpatialStructure",
+					field: "RelatedElements"
+				}
+			}
+		},
+		ExternalWalls: {
+			type: "IfcWall",
+			includeAllSubtypes: true,
+			properties: {
+				IsExternal: true
+			}
+		},
+		ThermalTransmittance: {
+			type: "IfcWall",
+			includeAllSubtypes: true,
+			properties: {
+				ThermalTransmittance: {
+					comparator: ">",
+					value: 0.2
+				}
+			}
+		},
+		IfcPresentationLayerAssignment: {
+			type: "IfcPresentationLayerAssignment",
+			name: "Räume",
+			include: {
+				type: "IfcPresentationLayerAssignment",
+				field: "AssignedItems"
+			}
+		},
+		ObjectInBoundingBox: {
+			type: "IfcFurnishingElement",
+			inBoundingBox: {
+				x: 0,
+				y: 0,
+				z: 0,
+				width: 5,
+				height: 5,
+				depth: 5
+			}
+		}
+	};
+	
+	this.show = function(){
+		cd.show();
+	};
+	
+	this.hide = function(){
+		cd.hide();
+	};
+	
+	cd.find("select").change(function(){
+		var query = o.queries[cd.find("select").val()];
+		var json = JSON.stringify(query, null, "  ");
+		cd.find("textarea").val(json);
+	});
+	
+	this.addRevision = function(project, roid, types){
+		o.schema = project.schema;
+		o.roids.push(roid);
+
+		if (o.examplesLoaded) {
+			return;
+		}
+		
+		if (o.schema == "ifc2x3tc1") {
+			o.queries = o.queriesIfc2x3tc1;
+		} else if (o.schema == "ifc4") {
+			o.queries = o.queriesIfc4;
+		}
+		cd.find("select").append("<option>Select a query or create your own</option>");
+		for (var queryKey in o.queries) {
+		    if (o.queries.hasOwnProperty(queryKey)) {
+		    	var option = $("<option>" + queryKey + "</option>");
+		    	cd.find("select").append(option);
+		    }
+		}
+		o.examplesLoaded = true;
+	};
+	
+	this.loadRevision = function(project, roid, types) {
+	};
+	
+	this.unloadRevision = function(poid, roid) {
+	};
+	
+	this.parseJson = function(){
+		cd.find(".errorsDiv").removeClass("alert-danger").html("").hide();
+		
+		try {
+			var jsonObject = JSON.parse(cd.find("textarea").val());
+			return jsonObject;
+		} catch (error) {
+			cd.find(".errorsDiv").addClass("alert-danger").html(error).show();
+			cd.parents(".panel-body").animate({scrollTop:0},0);
+		}
+		return null;
+	};
+	
+	cd.find(".queryAddBtn").click(function(e){
+		e.preventDefault();
+		o.roids.forEach(function(roid){
+			var model = parent.models[roid];
+			if (model != null) {
+				model.reset();
+				var oids = [];
+				var jsonObject = o.parseJson();
+				if (jsonObject == null) {
+					return;
+				}
+				model.query(jsonObject, function(loaded){
+					if (loaded.getType() != "IfcOpeningElement") {
+						oids.push(loaded.oid);
+						loaded.trans.mode = 0;
+					}
+				}).done(function(){
+					parent.setObjectVisibility(roid, oids, 0);
+//				}).error(function(error){
+//					cd.find(".errorsDiv").addClass("alert-danger").html(error).show();
+				});
+			}
+		});
+	});
+
+	cd.find(".downloadBtn").click(function(e){
+		e.preventDefault();
+		var div = $("<div class=\"modal fade\">");
+		$(document.body).append(div);
+		
+		var jsonObject = o.parseJson();
+		if (jsonObject == null) {
+			return;
+		}
+
+		var roids = [];
+		o.roids.forEach(function(roid){
+			if (roid != -1) {
+				roids.push(roid);
+			}
+		});
+		
+		var params = {
+			downloadType: "download",
+			allowCheckouts: false,
+			query: cd.find("textarea").val(),
+			roids: roids
+		};
+		div.load(Global.baseDir + "download.html", function(){
+			new Download($(this), params);
+		}).modal("show");
+	});
+	
+	cd.find(".querySetBtn").click(function(e){
+		e.preventDefault();
+		o.roids.forEach(function(roid){
+			if (roid != -1) {
+				var model = parent.models[roid];
+				var oldOids = {};
+				for (var oid in model.objects) {
+					oldOids[oid] = true;
+				}
+				if (model != null) {
+					model.reset();
+					var oids = [];
+					var jsonObject = o.parseJson();
+					if (jsonObject == null) {
+						return;
+					}
+					model.query(jsonObject, function(loaded){
+						if (loaded.getType() != "IfcOpeningElement") {
+							oids.push(loaded.oid);
+							delete oldOids[loaded.oid];
+						}
+					}, function(error){
+						cd.find(".errorsDiv").addClass("alert-danger").html(error).show();
+						cd.parents(".panel-body").animate({scrollTop:0},0);
+					}).done(function(){
+						var oldOidsAr = [];
+						for (var oid in oldOids) {
+							oldOidsAr.push(oid);
+						}
+						if (oldOidsAr.length > 0) {
+							parent.setObjectVisibility(roid, oldOidsAr, 2);
+						}
+						parent.setObjectVisibility(roid, oids, 0);
+					});
+				}				
+			}
+		});
+	});
+
+	parent.modelAddedListeners.register(o.addRevision);
+	parent.modelLoadedListeners.register(o.loadRevision);
+	parent.modelUnloadedListeners.register(o.unloadRevision);
+	
+	this.resize = function(){
+		var height = ($(window).height() - $(".navbar").outerHeight() - $(".navbar-header").outerHeight() - $(".navigator .panel-heading").outerHeight() - 143);
+		cd.find(".queryInp").height(height + "px");
+	};
+
+	o.resize();
+	$(window).resize(o.resize);
+}
+</script>
