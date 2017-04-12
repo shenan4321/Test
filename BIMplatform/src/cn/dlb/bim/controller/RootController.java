@@ -2,7 +2,6 @@ package cn.dlb.bim.controller;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,14 +11,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import cn.dlb.bim.component.PlatformServer;
+import cn.dlb.bim.ifc.database.queries.om.JsonQueryObjectModelConverter;
+import cn.dlb.bim.ifc.database.queries.om.Query;
+import cn.dlb.bim.ifc.database.queries.om.QueryException;
+import cn.dlb.bim.ifc.emf.PackageMetaData;
+import cn.dlb.bim.ifc.emf.Schema;
 import cn.dlb.bim.service.IBimService;
-import cn.dlb.bim.vo.GeometryInfoVo;
 
 @Controller
 @RequestMapping("/")
@@ -30,6 +37,10 @@ public class RootController {
 	@Autowired
 	@Qualifier("BimService")
 	private IBimService bimService;
+	
+	@Autowired
+	@Qualifier("PlatformServer")
+	private PlatformServer server;
 
 	@RequestMapping("index")
 	public String index() {
@@ -95,12 +106,26 @@ public class RootController {
 		}
 
 		int rid = bimService.deserializeModelFileAndSave(targetFile);
-		List<GeometryInfoVo> geometryList = bimService.queryDbGeometryInfo(rid);
 		// model.addAttribute("fileUrl", request.getContextPath() +
 		// "/upload/"+fileName);
 		Map<String, Object> resMap = new HashMap<String, Object>();
 		resMap.put("success", "true");
-		resMap.put("geometries", geometryList);
+		return resMap;
+	}
+	
+	@RequestMapping(value = "jsonApi", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> jsonApi(@RequestBody ObjectNode jsonNode) {
+		PackageMetaData packageMetaData = server.getMetaDataManager()
+				.getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
+		JsonQueryObjectModelConverter converter = new JsonQueryObjectModelConverter(packageMetaData);
+		Query query = null;
+		try {
+			query = converter.parseJson("query", jsonNode);
+		} catch (QueryException e) {
+			e.printStackTrace();
+		}
+		Map<String, Object> resMap = new HashMap<String, Object>();
 		return resMap;
 	}
 
