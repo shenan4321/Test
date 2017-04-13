@@ -20,12 +20,20 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import cn.dlb.bim.component.PlatformInitDatas;
 import cn.dlb.bim.component.PlatformServer;
+import cn.dlb.bim.ifc.collada.ColladaSerializer;
+import cn.dlb.bim.ifc.database.IfcModelDbException;
+import cn.dlb.bim.ifc.database.IfcModelDbSession;
+import cn.dlb.bim.ifc.database.OldQuery;
 import cn.dlb.bim.ifc.database.queries.om.JsonQueryObjectModelConverter;
 import cn.dlb.bim.ifc.database.queries.om.Query;
 import cn.dlb.bim.ifc.database.queries.om.QueryException;
+import cn.dlb.bim.ifc.emf.IfcModelInterfaceException;
 import cn.dlb.bim.ifc.emf.PackageMetaData;
 import cn.dlb.bim.ifc.emf.Schema;
+import cn.dlb.bim.ifc.model.BasicIfcModel;
+import cn.dlb.bim.ifc.serializers.SerializerException;
 import cn.dlb.bim.service.IBimService;
 
 @Controller
@@ -123,6 +131,32 @@ public class RootController {
 		try {
 			query = converter.parseJson("query", jsonNode);
 		} catch (QueryException e) {
+			e.printStackTrace();
+		}
+		Map<String, Object> resMap = new HashMap<String, Object>();
+		return resMap;
+	}
+	
+	@RequestMapping(value = "test", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> test() {
+		PackageMetaData packageMetaData = server.getMetaDataManager()
+				.getPackageMetaData(Schema.IFC2X3TC1.getEPackageName());
+		PlatformInitDatas platformInitDatas = server.getPlatformInitDatas();
+		IfcModelDbSession session = new IfcModelDbSession(server.getIfcModelDao(), server.getMetaDataManager(), platformInitDatas);
+		BasicIfcModel model = new BasicIfcModel(packageMetaData);
+		try {
+			session.get(1, model, new OldQuery(packageMetaData, true));
+		} catch (IfcModelDbException e) {
+			e.printStackTrace();
+		} catch (IfcModelInterfaceException e) {
+			e.printStackTrace();
+		}
+		ColladaSerializer colladaSerializer = new ColladaSerializer();
+		try {
+			colladaSerializer.init(model, null, true);
+			colladaSerializer.writeToFile(new File("test.dae").toPath(), null);
+		} catch (SerializerException e) {
 			e.printStackTrace();
 		}
 		Map<String, Object> resMap = new HashMap<String, Object>();
