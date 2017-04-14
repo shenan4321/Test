@@ -58,7 +58,7 @@ public class KmzSerializer extends EmfSerializer {
 				writeKmlFile(zipOutputStream);
 				zipOutputStream.closeEntry();
 				zipOutputStream.putNextEntry(new ZipEntry("files/collada.dae"));
-				ifcToCollada.write(zipOutputStream, null);
+				ifcToCollada.writeToOutputStream(zipOutputStream, progressReporter);
 				zipOutputStream.closeEntry();
 				zipOutputStream.finish();
 				zipOutputStream.flush();
@@ -110,7 +110,7 @@ public class KmzSerializer extends EmfSerializer {
 		writer.println("			<z>1</z>");
 		writer.println("		</Scale>");
 		writer.println("		<Link>");
-		writer.println("			<href>vxvxcvcx (15).kmz/files/collada.dae</href>");
+		writer.println("			<href>files/collada.dae</href>");
 		writer.println("		</Link>");
 		writer.println("		<ResourceMap>");
 //		writer.println("			<Alias>");
